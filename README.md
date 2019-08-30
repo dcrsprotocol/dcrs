@@ -1,12 +1,4 @@
-The Dark (Darkcrystal) is cryptocurrency of Ukrainian origin, just like Bitcoin but more anonymous and privacy centric with opaque and more analysis resistant blockchain. It is people's electronic cash, not connected to government or officials.
 
-Goal of Dark project is to create anonymous stablecoin – decentralized cryptocurrency with low price volatility by using new to crypto world techniques of regulating coin supply and its market price.
-
-Key principle of CryptoNote is adaptive parameters. Dark already has adaptive block size limit and difficulty. In addition to it Dark will implement adaptive emission, adaptive minimal transaction fee and adaptive monetary deposit interest rate to achieve this goal.
-
-**HARDFORK V4 IS SET AT HEIGHT 266000!!!** In this hardfork _we introduce adaptive minimal transaction fee_ as first step towards our goal. Information for exchanges and other services how to work with new 
-
-Pools operating **'cryptonote-forknote-pool'** or compatible software should update Node-Cryptonote-Util to this version: https://github.com/aivve/node-cryptonote-util. The reference pool software is here: h
 
 Pools operating **'cryptonote-nodejs-pool'** should _change config on hardfork height_. The changes in config are:
 ```
