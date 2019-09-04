@@ -1,4 +1,5 @@
 
+
 Pools operating **'cryptonote-nodejs-pool'** should _change config on hardfork height_. The changes in config are:
 ```
 "daemonType": "default",
