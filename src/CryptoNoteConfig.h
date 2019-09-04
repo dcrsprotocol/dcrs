@@ -119,7 +119,7 @@ const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json"
 } // parameters
 
 const char     CRYPTONOTE_NAME[]                             = "darkcrystal";
-const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff00019e91c191c79502029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101807f93dda5e094d724382283bf463f307fa1776d75bb6d6984e5fbfd1d91d070";
+const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff00019e91c191c79502029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210109913a9ed77bc5bda0db441921a3bba1754d6e040a0d0118134b61f381cbdfdc";
 
 const uint8_t  CURRENT_TRANSACTION_VERSION                   =  1;
 const uint8_t  BLOCK_MAJOR_VERSION_1                         =  1;
@@ -134,8 +134,8 @@ const size_t   BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT        =  10000;  //by def
 const size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT            =  128;    //by default, blocks count in blocks downloading
 const size_t   COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT         =  1000;
 
-const int      P2P_DEFAULT_PORT                              =  26150;
-const int      RPC_DEFAULT_PORT                              =  26151;
+const int      P2P_DEFAULT_PORT                              =  15260;
+const int      RPC_DEFAULT_PORT                              =  15261;
 
 const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT                =  1000;
 const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT                 =  5000;
@@ -158,10 +158,10 @@ const uint32_t P2P_IDLE_CONNECTION_KILL_INTERVAL             = (5 * 60);      //
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "8f80f9a5a434a9f1510d13336228debfee9c918ce505efe225d8c94d045fa115";
 
 const char* const SEED_NODES[] = { 
-  "3.15.21.171:26150",
-  "52.56.216.238:26150",
-  "3.0.96.44:26150",
-  "15.164.219.127:26150"
+  "3.0.96.44:15260",
+  "3.15.21.171:15260",
+  "15.164.219.127:15260",
+  "52.56.216.238:15260"
 
 };
 

@@ -36,7 +36,7 @@ RUN_DIR="/var/run/dark"
 XDCS="/usr/sbin/simplewallet"
 
 XDCS_NODE_HOST="127.0.0.1"
-XDCS_NODE_PORT="26151"
+XDCS_NODE_PORT="15261"
 XDCS_WALLET="Wallet.dat"
 XDCS_PASS="pass"
 XDCS_LOG_LEVEL="3"
