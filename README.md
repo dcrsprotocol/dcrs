@@ -1,5 +1,4 @@
 
-
 Pools operating **'cryptonote-nodejs-pool'** should _change config on hardfork height_. The changes in config are:
 ```
 "daemonType": "default",
@@ -7,11 +6,11 @@ Pools operating **'cryptonote-nodejs-pool'** should _change config on hardfork h
 "cnVariant": 0,
 "cnBlobType": 0,
 ```
-The example of Dark config is here: 
+The example of DCRS config is here: 
 
 
 
-## Building Dark 
+## Building DCRS 
 
 ### On *nix
 

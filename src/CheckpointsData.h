@@ -3,18 +3,18 @@
 // Copyright (c) 2019-2019, The Darkcrystal developers
 //
 //
-// Dark is free software: you can redistribute it and/or modify
+// DCRS is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Dark is distributed in the hope that it will be useful,
+// DCRS is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Dark.  If not, see <http://www.gnu.org/licenses/>.
+// along with DCRS.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -29,7 +29,7 @@ struct CheckpointData {
 };
 
 const std::initializer_list<CheckpointData> CHECKPOINTS = { 
-  //{100000,  "0000000000000000000000000000000000000000000000000000000000000000" },
+  {6685,  "7d801d0347bab7e30a3ac61f2b72230993024b7ef141bf1d15fbef0ee531be27" }
   //{200000,  "0000000000000000000000000000000000000000000000000000000000000000" }
 };
   

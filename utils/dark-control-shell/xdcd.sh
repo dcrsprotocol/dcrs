@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2016-2018, Dark developers
+# Copyright (c) 2016-2018, DCRS developers
 # English correction by Grabbers
 #
 # All rights reserved
@@ -30,9 +30,9 @@
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-DATA_DIR="/var/dark"
-LOG_DIR="/var/log/dark"
-RUN_DIR="/var/run/dark"
+DATA_DIR="/var/dcrs"
+LOG_DIR="/var/log/dcrs"
+RUN_DIR="/var/run/dcrs"
 TMP_DIR="/tmp"
 HTDOCS_DIR="/tmp"
 
@@ -46,7 +46,7 @@ XDCD_LOG_LEVEL="2"
 XDCD_FEE_ADDRESS=""
 XDCD_VIEW_KEY=""
 
-XDCS_CONTROL="/usr/lib/dark/xdcs.sh"
+XDCS_CONTROL="/usr/lib/dcrs/xdcs.sh"
 
 SIGTERM_TIMEOUT=240
 SIGKILL_TIMEOUT=120

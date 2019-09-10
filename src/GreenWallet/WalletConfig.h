@@ -34,7 +34,7 @@ namespace WalletConfig
     const std::string walletdName = "walletd";
 
     /* The full name of your crypto */
-    const std::string coinName = "Dark";
+    const std::string coinName = "DCRS";
 
     /* Where can your users contact you for support? E.g. discord */
     const std::string contactLink = "https://darkisland.network";
