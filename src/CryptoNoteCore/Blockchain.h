@@ -1,5 +1,6 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2016, The DarkCrystal developers
+// Copyright (c) 2016, The Karbowanec developers
 //
 // This file is part of DCRS.
 //
@@ -23,6 +24,14 @@
 #include "google/sparse_hash_set"
 #include "google/sparse_hash_map"
 
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/composite_key.hpp>
+#include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/multi_index/mem_fun.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/random_access_index.hpp>
+
 #include "Common/ObserverManager.h"
 #include "Common/Util.h"
 #include "CryptoNoteCore/BlockIndex.h"
@@ -45,6 +54,7 @@
 #undef ERROR
 
 namespace CryptoNote {
+
   struct NOTIFY_REQUEST_GET_OBJECTS_request;
   struct NOTIFY_RESPONSE_GET_OBJECTS_request;
   struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_request;
@@ -82,7 +92,7 @@ namespace CryptoNote {
     bool getBlockHeight(const Crypto::Hash& blockId, uint32_t& blockHeight);
 
     template<class archive_t> void serialize(archive_t & ar, const unsigned int version);
-
+    
     bool haveTransaction(const Crypto::Hash &id);
     bool haveTransactionKeyImagesAsSpent(const Transaction &tx);
 
@@ -197,8 +207,24 @@ namespace CryptoNote {
       }
     };
 
+    struct SpentKeyImage {
+      uint32_t blockIndex;
+      Crypto::KeyImage keyImage;
+
+      void serialize(ISerializer& s) {
+        s(blockIndex, "block_index");
+        s(keyImage, "key_image");
+      }
+    };
+
     void rollbackBlockchainTo(uint32_t height);
     bool have_tx_keyimg_as_spent(const Crypto::KeyImage &key_im);
+
+    bool checkIfSpent(const Crypto::KeyImage& keyImage, uint32_t blockIndex);
+    bool checkIfSpent(const Crypto::KeyImage& keyImage);
+
+    //bool checkIfSpentMultisignature(uint64_t amount, uint32_t globalIndex) const override;
+    //bool checkIfSpentMultisignature(uint64_t amount, uint32_t globalIndex, uint32_t blockIndex) const override;
 
   private:
 
@@ -242,7 +268,22 @@ namespace CryptoNote {
       }
     };
 
-    typedef google::sparse_hash_set<Crypto::KeyImage> key_images_container;
+    struct BlockIndexTag {};
+    struct KeyImageTag {};
+
+    typedef boost::multi_index_container<
+      SpentKeyImage,
+      boost::multi_index::indexed_by<
+      boost::multi_index::ordered_non_unique<
+      boost::multi_index::tag<BlockIndexTag>,
+      BOOST_MULTI_INDEX_MEMBER(SpentKeyImage, uint32_t, blockIndex)
+      >,
+      boost::multi_index::hashed_unique<
+      boost::multi_index::tag<KeyImageTag>,
+      BOOST_MULTI_INDEX_MEMBER(SpentKeyImage, Crypto::KeyImage, keyImage)
+      >
+      >
+    > SpentKeyImagesContainer;
     typedef std::unordered_map<Crypto::Hash, BlockEntry> blocks_ext_by_hash;
     typedef google::sparse_hash_map<uint64_t, std::vector<std::pair<TransactionIndex, uint16_t>>> outputs_container; //Crypto::Hash - tx hash, size_t - index of out in transaction
     typedef google::sparse_hash_map<uint64_t, std::vector<MultisignatureOutputUsage>> MultisignatureOutputsContainer;
@@ -253,7 +294,7 @@ namespace CryptoNote {
     Crypto::cn_context m_cn_context;
     Tools::ObserverManager<IBlockchainStorageObserver> m_observerManager;
 
-    key_images_container m_spent_keys;
+    SpentKeyImagesContainer spentKeyImages;
     size_t m_current_block_cumul_sz_limit;
     blocks_ext_by_hash m_alternative_chains; // Crypto::Hash -> block_extended_info
     outputs_container m_outputs;

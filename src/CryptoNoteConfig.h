@@ -121,6 +121,7 @@ const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json"
 
 const char     CRYPTONOTE_NAME[]                             = "darkcrystal";
 const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff0001b595e3a3a817029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101dcc8d81a270e3068a10578175d87972a417c334c5dfa31dbb6b2a506800123dc";
+const char     DNS_CHECKPOINTS_HOST[]                        = "dcrs.checkpoints.darkisland.network";
 
 const uint8_t  CURRENT_TRANSACTION_VERSION                   =  1;
 const uint8_t  BLOCK_MAJOR_VERSION_1                         =  1;

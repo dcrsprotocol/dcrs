@@ -31,7 +31,7 @@
 #include "ICore.h"
 #include "ICoreObserver.h"
 #include "Common/ObserverManager.h"
-
+#include "CryptoNoteCore/Checkpoints.h"
 #include "System/Dispatcher.h"
 #include "CryptoNoteCore/MessageQueue.h"
 #include "CryptoNoteCore/BlockchainMessages.h"
@@ -168,6 +168,7 @@ namespace CryptoNote {
      virtual bool getMixin(const Transaction& transaction, uint64_t& mixin) override;
 
      bool is_key_image_spent(const Crypto::KeyImage& key_im);
+     bool is_key_image_spent(const Crypto::KeyImage& key_im, uint32_t height);
 
    private:
      bool add_new_tx(const Transaction& tx, const Crypto::Hash& tx_hash, size_t blob_size, tx_verification_context& tvc, bool keeped_by_block);
@@ -199,6 +200,7 @@ namespace CryptoNote {
      std::vector<Crypto::Hash> findIdsForShortBlocks(uint32_t startOffset, uint32_t startFullOffset);
 
      const Currency& m_currency;
+     Checkpoints m_checkpoints;
      Logging::LoggerRef logger;
      CryptoNote::RealTimeProvider m_timeProvider;
      tx_memory_pool m_mempool;
