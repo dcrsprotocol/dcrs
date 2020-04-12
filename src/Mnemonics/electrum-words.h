@@ -1,5 +1,5 @@
 ﻿// Copyright (c) 2014-2017, The Monero Project
-// Copyright (c) 2019-2019, Drak developers
+// Copyright (c) 2017-2018, DCRS developers
 // 
 // All rights reserved.
 // 

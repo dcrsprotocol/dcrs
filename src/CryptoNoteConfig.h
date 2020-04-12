@@ -3,8 +3,9 @@
 // Copyright (c) 2014-2018, The Forknote developers
 // Copyright (c) 2018, Ryo Currency Project
 // Copyright (c) 2016-2018, The Karbowanec developers
-// Copyright (c) 2019-2019, The Darkcrystal developers
+// Copyright (c) 2019-2019, The DarkCrystal developers
 //
+// This file is part of DCRS.
 //
 // DCRS is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -42,11 +43,11 @@ const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW             = 60;
 const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V1          = 11;
 
 // MONEY_SUPPLY - total number coins to be generated
-const uint64_t MONEY_SUPPLY                                  = UINT64_C(10000000000000000000);
+const uint64_t MONEY_SUPPLY                                  = UINT64_C(210000000000000000);
 const uint64_t COIN                                          = UINT64_C(100000000);
 const uint64_t TAIL_EMISSION_REWARD                          = UINT64_C(100000000);
 const size_t CRYPTONOTE_COIN_VERSION                         = 1;
-const unsigned EMISSION_SPEED_FACTOR                         = 20;
+const unsigned EMISSION_SPEED_FACTOR                         = 18;
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 
 const size_t   CRYPTONOTE_REWARD_BLOCKS_WINDOW               = 100;
@@ -57,11 +58,11 @@ const size_t   CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_CURRENT = CRYPTONOTE_BL
 const size_t   CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE        = 600;
 const size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT              = 8;
 
-const uint64_t MINIMUM_FEE_V1                                = UINT64_C(100000000);       //duo le 40
-const uint64_t MINIMUM_FEE_V2                                = UINT64_C(100000000000);    //duo le 40
+const uint64_t MINIMUM_FEE_V1                                = UINT64_C(1000);
+const uint64_t MINIMUM_FEE_V2                                = UINT64_C(1000000);
 const uint32_t MINIMUM_FEE_V2_HEIGHT                         = 216394;
 const uint64_t MINIMUM_FEE                                   = MINIMUM_FEE_V2;
-const uint64_t MAXIMUM_FEE                                   = UINT64_C(100000000000);  //duo le 40
+const uint64_t MAXIMUM_FEE                                   = UINT64_C(1000000);
 
 const uint64_t DEFAULT_DUST_THRESHOLD                        = UINT64_C(10000);
 const uint64_t MIN_TX_MIXIN_SIZE                             = 2;
@@ -119,7 +120,7 @@ const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json"
 } // parameters
 
 const char     CRYPTONOTE_NAME[]                             = "darkcrystal";
-const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff00019e91c191c79502029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210109913a9ed77bc5bda0db441921a3bba1754d6e040a0d0118134b61f381cbdfdc";
+const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff0001b595e3a3a817029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101dcc8d81a270e3068a10578175d87972a417c334c5dfa31dbb6b2a506800123dc";
 
 const uint8_t  CURRENT_TRANSACTION_VERSION                   =  1;
 const uint8_t  BLOCK_MAJOR_VERSION_1                         =  1;
@@ -158,11 +159,10 @@ const uint32_t P2P_IDLE_CONNECTION_KILL_INTERVAL             = (5 * 60);      //
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "8f80f9a5a434a9f1510d13336228debfee9c918ce505efe225d8c94d045fa115";
 
 const char* const SEED_NODES[] = { 
-  "3.0.96.44:15260",
-  "3.15.21.171:15260",
-  "15.164.219.127:15260",
-  "52.56.216.238:15260"
-
+  "3.113.4.26:15260",
+  "3.112.4.73:15260",
+  "150.109.125.175:15260",
+  "124.156.110.149:15260"
 };
 
 } // CryptoNote

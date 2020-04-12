@@ -1,6 +1,6 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// Copyright (c) 2019-2019, The Drak Developers
-// Copyright (c) 2019-2019, The Darkcrystal developers
+// Copyright (c) 2019-2019, The DCRS Developers
+// Copyright (c) 2019-2019, The DarkCrystal developers
 // 
 // Please see the included LICENSE file for more information.
 
@@ -37,7 +37,7 @@ namespace WalletConfig
     const std::string coinName = "DCRS";
 
     /* Where can your users contact you for support? E.g. discord */
-    const std::string contactLink = "https://darkisland.network";
+    const std::string contactLink = "https://dcrs.darkisland.network";
 
     /* The number of decimals your coin has */
     const int numDecimalPlaces = CryptoNote::parameters

@@ -1,10 +1,10 @@
-// Copyright (c) 2019-2019, Drak developers
+// Copyright (c) 2017-2018, DCRS developers
 /*!
  *  file Polish.h
  *
  *  brief Polish word list and map.
  *
- *  
+ *  Created by DarkCrystal contributor Lastik, edited by Aiwe
  *  Based on https://pl.wiktionary.org/wiki/Kategoria:Listy_frekwencyjne
  *
  */

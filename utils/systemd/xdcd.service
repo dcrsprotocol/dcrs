@@ -1,0 +1,17 @@
+[Unit]
+Description=Darkcrystal XDC service
+After=network.target
+
+[Service]
+Type=oneshot
+User=DCRS
+Group=DCRS
+PermissionsStartOnly=true
+RemainAfterExit=yes
+ExecStartPre=-/bin/mkdir -p /var/run/DCRS
+ExecStartPre=/bin/chown -R DCRS:DCRS /var/run/DCRS/
+ExecStart=/usr/lib/DCRS/xdcd.sh --start
+ExecStop=/usr/lib/DCRS/xdcd.sh --stop
+
+[Install]
+WantedBy=multi-user.target

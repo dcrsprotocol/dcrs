@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// Copyright (c) 2019-2019, The Drak Developers
+// Copyright (c) 2018-2019, The DarkCrystal developers
 // 
 // Please see the included LICENSE file for more information.
 

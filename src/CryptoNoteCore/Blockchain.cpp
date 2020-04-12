@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers, The Monero developers
 // Copyright (c) 2018, Ryo Currency Project
-// Copyright (c) 2019-2019, The XDC developers
+// Copyright (c) 2016-2019, The DarkCrystal developers
 //
 // This file is part of DCRS.
 //

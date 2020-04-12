@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2016, The Forknote developers
-// Copyright (c) 2017-2018, The DCRS developers
+// Copyright (c) 2017-2019, The DarkCrystal developers
 //
 // This file is part of DCRS.
 //

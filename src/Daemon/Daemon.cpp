@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2016, The Forknote developers
 // Copyright (c) 2018, The TurtleCoin developers
-// Copyright (c) 2019-2019, The XDC developers
+// Copyright (c) 2016-2019, The DarkCrystal developers
 //
 // This file is part of DCRS.
 //
@@ -215,7 +215,6 @@ int main(int argc, char* argv[])
     }
 
 	std::cout <<
-  
 "\n                                                                          \n"
 " ██ ██ ██ ██    ██ ██ ██ ██   ██ ██ ██ ██ ██ ██      ██ ██ ██ ██ ██ ██ ██   \n"
 " ██ ░░ ░░ ██    ██ ░░ ░░ ██   ██ ░░ ░░ ░░ ░░ ██ ██   ██ ░░ ░░ ░░ ░░ ░░ ██   \n"
@@ -229,11 +228,6 @@ int main(int argc, char* argv[])
 " ██ ░░ ░░ ██    ██ ░░ ░░ ██   ██ ░░ ░░ ░░ ░░ ██ ██   ██ ░░ ░░ ░░ ░░ ░░ ██   \n"
 " ██ ██ ██ ██    ██ ██ ██ ██   ██ ██ ██ ██ ██ ██      ██ ██ ██ ██ ██ ██ ██   \n"
 "                                                                            \n" << ENDL;
-
-
-
-
-
 
     logger(INFO) << "Module folder: " << argv[0];
 

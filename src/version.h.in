@@ -2,8 +2,8 @@
 #define STR(x) STR_HELPER(x)
 
 #define PROJECT_NAME "DCRS"
-#define PROJECT_SITE "https://darkisland.network"
-#define PROJECT_COPYRIGHT "Copyright 2019-2019, DCRS Developers"
+#define PROJECT_SITE "https://dcrs.darkIsland.network"
+#define PROJECT_COPYRIGHT "Copyright 2016-2019, DCRS Developers"
 #define APP_VER_MAJOR 1
 #define APP_VER_MINOR 6
 #define APP_VER_REV 5

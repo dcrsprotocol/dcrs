@@ -2,9 +2,9 @@
 // Copyright (c) 2014-2018, The Monero project
 // Copyright (c) 2014-2018, The Forknote developers
 // Copyright (c) 2018, The TurtleCoin developers
-// Copyright (c) 2016-2018, The Karbowanec developers
-// Copyright (c) 2019-2019, The Darkcrystal developers
+// Copyright (c) 2016-2018, The DarkCrystal developers
 //
+// This file is part of DCRS.
 //
 // DCRS is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by

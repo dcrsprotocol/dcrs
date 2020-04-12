@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// Copyright (c) 2019-2019, The Drak Developers
+// Copyright (c) 2018-2019, The DarkCrystal developers
 // 
 // Please see the included LICENSE file for more information.
 
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 {
 	/* Fix wallet not responding when enter cyrillic (non-latin) characters 
 	   by setting operating system default locale.
-	   Set cyrillic locale on Windows explicitly - this is Darkcrystal after all. */
+	   Set cyrillic locale on Windows explicitly - this is DarkCrystal after all. */
 	setlocale(LC_CTYPE, "");
 #ifdef WIN32
 	SetConsoleCP(1251);

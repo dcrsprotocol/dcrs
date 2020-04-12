@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2019, Drak developers
+// Copyright (c) 2017-2018, DCRS developers
 //
 // This file is part of DCRS.
 //

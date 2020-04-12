@@ -1,8 +1,8 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2016-2018  zawy12
-// Copyright (c) 2016-2018, The Karbowanec developers
-// Copyright (c) 2019-2019, The Darkcrystal developers
+// Copyright (c) 2016-2018, The DarkCrystal developers
 //
+// This file is part of DCRS.
 //
 // DCRS is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -583,7 +583,7 @@ namespace CryptoNote {
 		// Copyright (c) 2017-2018 Zawy
 		// MIT license http://www.opensource.org/licenses/mit-license.php.
 		// This is an improved version of Tom Harding's (Deger8) "WT-144"  
-		// Darkcrystal , Masari, Bitcoin Gold, and Bitcoin Cash have contributed.
+		// DarkCrystal, Masari, Bitcoin Gold, and Bitcoin Cash have contributed.
 		// See https://github.com/zawy12/difficulty-algorithms/issues/1 for other algos.
 		// Do not use "if solvetime < 0 then solvetime = 1" which allows a catastrophic exploit.
 		// T= target_solvetime;

@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
-// Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2019-2019, The Darkcrystal developers
+// Copyright (c) 2016-2017 The DarkCrystal developers
 //
+// This file is part of DCRS.
 //
 // DCRS is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
