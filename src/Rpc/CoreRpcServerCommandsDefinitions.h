@@ -288,7 +288,6 @@ struct COMMAND_RPC_GET_INFO {
     uint64_t grey_peerlist_size;
     uint32_t last_known_block_index;
     uint64_t start_time;
-    std::string fee_address;
     uint8_t block_major_version;
     std::string already_generated_coins;
     std::string contact;   
@@ -312,7 +311,6 @@ struct COMMAND_RPC_GET_INFO {
       KV_MEMBER(grey_peerlist_size)
       KV_MEMBER(last_known_block_index)
       KV_MEMBER(start_time)
-      KV_MEMBER(fee_address)
       KV_MEMBER(block_major_version)
       KV_MEMBER(already_generated_coins)
       KV_MEMBER(contact)      
@@ -337,14 +335,59 @@ struct COMMAND_RPC_GET_PEER_LIST {
 	typedef EMPTY_STRUCT request;
 
 	struct response {
-		std::vector<std::string> peers;
+		std::vector<std::string> anchor_peers;
+		std::vector<std::string> white_peers;
+		std::vector<std::string> gray_peers;
 		std::string status;
 
 		void serialize(ISerializer &s) {
-			KV_MEMBER(peers)
+			KV_MEMBER(anchor_peers)
+			KV_MEMBER(white_peers)
+			KV_MEMBER(gray_peers)
 			KV_MEMBER(status)
 		}
 	};
+};
+
+//-----------------------------------------------
+struct p2p_connection_entry
+{
+  uint8_t version;
+  std::string state;
+  std::string connection_id;
+  std::string remote_ip;
+  uint32_t remote_port = 0;
+  bool is_incoming = false;
+  uint64_t started = 0;
+  uint32_t remote_blockchain_height = 0;
+  uint32_t last_response_height = 0;
+
+  void serialize(ISerializer& s)
+  {
+    KV_MEMBER(version)
+    KV_MEMBER(state)
+    KV_MEMBER(connection_id)
+    KV_MEMBER(remote_ip)
+    KV_MEMBER(remote_port)
+    KV_MEMBER(is_incoming)
+    KV_MEMBER(started)
+    KV_MEMBER(remote_blockchain_height)
+    KV_MEMBER(last_response_height)
+  }
+};
+
+struct COMMAND_RPC_GET_CONNECTIONS {
+  typedef EMPTY_STRUCT request;
+
+  struct response {
+    std::vector<p2p_connection_entry> connections;
+    std::string status;
+
+    void serialize(ISerializer &s) {
+      KV_MEMBER(connections)
+      KV_MEMBER(status)
+    }
+  };
 };
 
 //-----------------------------------------------
@@ -353,11 +396,13 @@ struct COMMAND_RPC_GET_FEE_ADDRESS {
 
   struct response {
     std::string fee_address;
-	std::string status;
+    uint64_t    fee_amount;
+    std::string status;
 
     void serialize(ISerializer &s) {
       KV_MEMBER(fee_address)
-	  KV_MEMBER(status)
+      KV_MEMBER(fee_amount)
+      KV_MEMBER(status)
     }
   };
 };
@@ -543,6 +588,26 @@ struct COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT {
   };
 
   typedef BLOCK_HEADER_RESPONSE response;
+};
+
+struct COMMAND_RPC_GET_BLOCK_TIMESTAMP_BY_HEIGHT {
+  struct request {
+    uint32_t height;
+
+    void serialize(ISerializer &s) {
+      KV_MEMBER(height)
+    }
+  };
+
+  struct response {
+    uint64_t timestamp;
+    std::string status;
+
+    void serialize(ISerializer &s) {
+      KV_MEMBER(timestamp)
+      KV_MEMBER(status)
+    }
+  };
 };
 
 struct COMMAND_RPC_GET_BLOCKS_LIST {
@@ -1031,6 +1096,75 @@ struct COMMAND_RPC_CHECK_RESERVE_PROOF {
 			KV_MEMBER(locked)
 		}
 	};
+};
+
+
+struct block_stats_entry {
+  uint32_t height;
+  uint64_t already_generated_coins;
+  uint64_t transactions_count;
+  uint64_t block_size;
+  uint64_t difficulty;
+  uint64_t reward;
+  uint64_t timestamp;
+  //uint64_t min_fee;
+
+  void serialize(ISerializer &s) {
+    KV_MEMBER(height)
+    KV_MEMBER(already_generated_coins)
+    KV_MEMBER(transactions_count)
+    KV_MEMBER(block_size)
+    KV_MEMBER(difficulty)
+    KV_MEMBER(reward)
+    KV_MEMBER(timestamp)
+    //KV_MEMBER(min_fee)
+  }
+};
+
+struct COMMAND_RPC_GET_STATS_BY_HEIGHTS {
+  struct request {
+    std::vector<uint32_t> heights;
+
+    void serialize(ISerializer& s) {
+      KV_MEMBER(heights);
+    }
+  };
+
+  struct response {
+    std::vector<block_stats_entry> stats;
+    double duration;
+    std::string status;
+
+    void serialize(ISerializer& s) {
+      KV_MEMBER(stats);
+      KV_MEMBER(duration);
+      KV_MEMBER(status);
+    }
+  };
+};
+
+struct COMMAND_RPC_GET_STATS_BY_HEIGHTS_RANGE {
+  struct request {
+    uint32_t start_height;
+    uint32_t end_height;
+
+    void serialize(ISerializer& s) {
+      KV_MEMBER(start_height);
+      KV_MEMBER(end_height);
+    }
+  };
+
+  struct response {
+    std::vector<block_stats_entry> stats;
+    double duration;
+    std::string status;
+
+    void serialize(ISerializer& s) {
+      KV_MEMBER(stats);
+      KV_MEMBER(duration);
+      KV_MEMBER(status);
+    }
+  };
 };
 
 }

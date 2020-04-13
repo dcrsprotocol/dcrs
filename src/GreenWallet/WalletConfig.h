@@ -37,7 +37,7 @@ namespace WalletConfig
     const std::string coinName = "DCRS";
 
     /* Where can your users contact you for support? E.g. discord */
-    const std::string contactLink = "https://dcrs.darkisland.network";
+    const std::string contactLink = "http://dcrs.darkisland.network";
 
     /* The number of decimals your coin has */
     const int numDecimalPlaces = CryptoNote::parameters

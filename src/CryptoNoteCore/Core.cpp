@@ -1,4 +1,5 @@
-// Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers, The Karbowanec developers
+// Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2016-2020, The Karbo developers
 //
 // This file is part of Karbo.
 //
@@ -106,7 +107,7 @@ bool Core::handle_command_line(const boost::program_options::variables_map& vm) 
   return true;
 }
 
-uint32_t Core::get_current_blockchain_height() {
+uint32_t Core::getCurrentBlockchainHeight() {
   return m_blockchain.getCurrentBlockchainHeight();
 }
 
@@ -136,19 +137,39 @@ void Core::getTransactions(const std::vector<Crypto::Hash>& txs_ids, std::list<T
   m_blockchain.getTransactions(txs_ids, txs, missed_txs, checkTxPool);
 }
 
+bool Core::getTransaction(const Crypto::Hash& id, Transaction& tx, bool checkTxPool) {
+  std::vector<Crypto::Hash> txs_ids;
+  std::list<Transaction> txs;
+  std::list<Crypto::Hash> missed_txs;
+
+  txs_ids.push_back(id);
+  m_blockchain.getTransactions(txs_ids, txs, missed_txs, checkTxPool);
+
+  if (missed_txs.empty() && !txs.empty() && txs.size() == 1) {
+    tx = txs.front();
+    return true;
+  }
+
+  return false;
+}
+
 bool Core::get_alternative_blocks(std::list<Block>& blocks) {
   return m_blockchain.getAlternativeBlocks(blocks);
 }
 
-size_t Core::get_alternative_blocks_count() {
+size_t Core::getAlternativeBlocksCount() {
   return m_blockchain.getAlternativeBlocksCount();
+}
+
+bool Core::getblockEntry(uint32_t height, uint64_t& block_cumulative_size, difficulty_type& difficulty, uint64_t& already_generated_coins, uint64_t& reward, uint64_t& transactions_count, uint64_t& timestamp) {
+  return m_blockchain.getblockEntry(static_cast<size_t>(height), block_cumulative_size, difficulty, already_generated_coins, reward, transactions_count, timestamp);
 }
 
 std::time_t Core::getStartTime() const {
   return start_time;
 }
 
-  //-----------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
 bool Core::init(const CoreConfig& config, const MinerConfig& minerConfig, bool load_existing) {
   m_config_folder = config.configFolder;
   bool r = m_mempool.init(m_config_folder);
@@ -244,7 +265,7 @@ bool Core::handle_incoming_tx(const BinaryArray& tx_blob, tx_verification_contex
   Crypto::Hash blockId;
   uint32_t blockHeight;
   bool ok = getBlockContainingTx(tx_hash, blockId, blockHeight);
-  if (!ok) blockHeight = this->get_current_blockchain_height();
+  if (!ok) blockHeight = this->getCurrentBlockchainHeight();
   return handleIncomingTransaction(tx, tx_hash, tx_blob.size(), tvc, keeped_by_block, blockHeight);
 }
 
@@ -302,16 +323,16 @@ bool Core::check_tx_fee(const Transaction& tx, size_t blobSize, tx_verification_
   const uint64_t fee = inputs_amount - outputs_amount;
   bool isFusionTransaction = fee == 0 && m_currency.isFusionTransaction(tx, blobSize, height);
   bool enough = true;
-  if (!isFusionTransaction && !m_checkpoints.is_in_checkpoint_zone(get_current_blockchain_height())) {
+  if (!isFusionTransaction && !m_checkpoints.is_in_checkpoint_zone(getCurrentBlockchainHeight())) {
     if (getBlockMajorVersionForHeight(height) < BLOCK_MAJOR_VERSION_4) {
-      if (fee < m_currency.minimumFee()) {
-        logger(INFO) << "[Core] Transaction fee is not enough: " << m_currency.formatAmount(fee) << ", minimum fee: " << m_currency.minimumFee();
+      if (fee < CryptoNote::parameters::MINIMUM_FEE_V1) {
+        logger(INFO) << "[Core] Transaction fee is not enough: " << m_currency.formatAmount(fee) << ", minimum fee: " << m_currency.formatAmount(CryptoNote::parameters::MINIMUM_FEE_V1);
         enough = false;
       }
     } else {
       uint64_t min = getMinimalFeeForHeight(height);
       if (fee < (min - min * 20 / 100)) {
-        logger(INFO) << "[Core] Transaction fee is not enough: " << m_currency.formatAmount(fee) << ", minimum fee: " << min;
+        logger(INFO) << "[Core] Transaction fee is not enough: " << m_currency.formatAmount(fee) << ", minimum fee: " << m_currency.formatAmount(min);
         enough = false;
       }
     }
@@ -423,7 +444,7 @@ bool Core::check_tx_inputs_keyimages_diff(const Transaction& tx) {
   return true;
 }
 
-size_t Core::get_blockchain_total_transactions() {
+size_t Core::getBlockchainTotalTransactions() {
   return m_blockchain.getTotalTransactions();
 }
 
@@ -606,8 +627,14 @@ void Core::pause_mining() {
 }
 
 void Core::update_block_template_and_resume_mining() {
-  update_miner_block_template();
-  m_miner->resume();
+  if (update_miner_block_template()) {
+    m_miner->resume();
+    logger(DEBUGGING) << "updated block template and resumed mining";
+  }
+  else {
+    logger(ERROR) << "updating block template failed, mining not resumed";
+    m_miner->stop();
+  }
 }
 
 bool Core::handle_block_found(Block& b) {
@@ -719,12 +746,24 @@ Crypto::Hash Core::get_tail_id() {
   return m_blockchain.getTailId();
 }
 
-size_t Core::get_pool_transactions_count() {
+size_t Core::getPoolTransactionsCount() {
   return m_mempool.get_transactions_count();
 }
 
 bool Core::have_block(const Crypto::Hash& id) {
   return m_blockchain.haveBlock(id);
+}
+
+bool Core::haveTransaction(const Crypto::Hash& id) {
+  if (m_blockchain.haveTransaction(id)) {
+    return true;
+  }
+
+  if (m_mempool.have_tx(id)) {
+    return true;
+  }
+
+  return false;
 }
 
 bool Core::parse_tx_from_blob(Transaction& tx, Crypto::Hash& tx_hash, Crypto::Hash& tx_prefix_hash, const BinaryArray& blob) {
@@ -744,6 +783,14 @@ std::vector<Transaction> Core::getPoolTransactions() {
     result.emplace_back(std::move(tx));
   }
   return result;
+}
+
+bool Core::getPoolTransaction(const Crypto::Hash& tx_hash, Transaction& transaction) {
+  if (!m_mempool.have_tx(tx_hash)) {
+    return false;
+  }
+
+  return m_mempool.getTransaction(tx_hash, transaction);
 }
 
 std::list<CryptoNote::tx_memory_pool::TransactionDetails> Core::getMemoryPool() const {
@@ -794,13 +841,12 @@ std::string Core::print_pool(bool short_format) {
 }
 
 bool Core::update_miner_block_template() {
-  m_miner->on_block_chain_update();
-  return true;
+  return m_miner->on_block_chain_update();
 }
 
 bool Core::on_idle() {
   if (!m_starter_message_showed) {
-    logger(INFO) << ENDL << "**********************************************************************" << ENDL
+    std::cout << ENDL << "**********************************************************************" << ENDL
       << "The daemon will start synchronizing with the network. It may take up to several hours." << ENDL
       << ENDL
       << "You can set the level of process detailization* through \"set_log <level>\" command*, where <level> is between 0 (no details) and 4 (very verbose)." << ENDL
@@ -808,7 +854,7 @@ bool Core::on_idle() {
       << "Use \"help\" command to see the list of available commands." << ENDL
       << ENDL
       << "Note: in case you need to interrupt the process, use \"exit\" command. Otherwise, the current progress won't be saved." << ENDL
-      << "**********************************************************************";
+      << "**********************************************************************" << ENDL;
     m_starter_message_showed = true;
   }
 
@@ -1020,6 +1066,11 @@ bool Core::scanOutputkeysForIndices(const KeyInput& txInToKey, std::list<std::pa
   return m_blockchain.scanOutputKeysForIndexes(txInToKey, vi);
 }
 
+bool Core::getBlockTimestamp(uint32_t height, uint64_t& timestamp) {
+  timestamp = m_blockchain.getBlockTimestamp(height);
+  return true;
+}
+
 bool Core::getBlockDifficulty(uint32_t height, difficulty_type& difficulty) {
   difficulty = m_blockchain.blockDifficulty(height);
   return true;
@@ -1131,8 +1182,16 @@ std::vector<Crypto::Hash> Core::getTransactionHashesByPaymentId(const Crypto::Ha
   return blockchainTransactionHashes;
 }
 
+difficulty_type Core::getAvgDifficulty(uint32_t height, size_t window) {
+  return m_blockchain.getAvgDifficulty(height, window);
+}
+
+difficulty_type Core::getAvgDifficulty(uint32_t height) {
+  return m_blockchain.getAvgDifficulty(height);
+}
+
 uint64_t Core::getMinimalFee() {
-  return getMinimalFeeForHeight(get_current_blockchain_height() - 1);
+  return getMinimalFeeForHeight(getCurrentBlockchainHeight() - 1);
 }
 
 uint64_t Core::getMinimalFeeForHeight(uint32_t height) {
@@ -1176,7 +1235,7 @@ bool Core::handleIncomingTransaction(const Transaction& tx, const Crypto::Hash& 
   }
 
   // is in checkpoint zone
-  if (!m_blockchain.isInCheckpointZone(get_current_blockchain_height())) {
+  if (!m_blockchain.isInCheckpointZone(getCurrentBlockchainHeight())) {
     if (blobSize > m_currency.maxTransactionSizeLimit() && getCurrentBlockMajorVersion() >= BLOCK_MAJOR_VERSION_4) {
       logger(INFO) << "Transaction verification failed: too big size " << blobSize << " of transaction " << txHash << ", rejected";
       tvc.m_verification_failed = true;
@@ -1220,7 +1279,7 @@ bool Core::handleIncomingTransaction(const Transaction& tx, const Crypto::Hash& 
   }
 
   if (tvc.m_added_to_pool) {
-    logger(DEBUGGING) << "tx added: " << txHash;
+    logger(DEBUGGING) << "Transaction added to pool: " << txHash;
     poolUpdated();
   }
 
@@ -1278,6 +1337,10 @@ bool Core::is_tx_spendtime_unlocked(uint64_t unlock_time) {
 
 bool Core::is_tx_spendtime_unlocked(uint64_t unlock_time, uint32_t height) {
   return m_blockchain.is_tx_spendtime_unlocked(unlock_time, height);
+}
+
+bool Core::isInCheckpointZone(uint32_t height) const {
+  return m_checkpoints.is_in_checkpoint_zone(height);
 }
 
 bool Core::addMessageQueue(MessageQueue<BlockchainMessage>& messageQueue) {

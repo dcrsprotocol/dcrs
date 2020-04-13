@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2016, The Monero Project
-// Copyright (c) 2016-2019, Karbo developers
+// Copyright (c) 2016-2020, Karbo developers
 //
 // All rights reserved.
 //
@@ -54,6 +54,8 @@
 #include "Transfers/BlockchainSynchronizer.h"
 #include "Transfers/TransfersSynchronizer.h"
 
+#include <Logging/LoggerRef.h>
+
 namespace CryptoNote {
 
 class SyncStarter;
@@ -64,7 +66,7 @@ class WalletLegacy :
   ITransfersObserver {
 
 public:
-  WalletLegacy(const CryptoNote::Currency& currency, INode& node, Logging::ILogger& loggerGroup);
+  WalletLegacy(const CryptoNote::Currency& currency, INode& node, Logging::ILogger& log);
   virtual ~WalletLegacy();
 
   virtual void addObserver(IWalletLegacyObserver* observer) override;
@@ -79,9 +81,6 @@ public:
   virtual void reset() override;
   virtual bool tryLoadWallet(std::istream& source, const std::string& password) override;
 
-  virtual Crypto::SecretKey generateKey(const std::string& password, const Crypto::SecretKey& recovery_param = Crypto::SecretKey(),
-	  bool recover = false, bool two_random = false) override;
-
   virtual void save(std::ostream& destination, bool saveDetailed = true, bool saveCache = true) override;
 
   virtual std::error_code changePassword(const std::string& oldPassword, const std::string& newPassword) override;
@@ -90,7 +89,7 @@ public:
 
   virtual uint64_t actualBalance() override;
   virtual uint64_t pendingBalance() override;
-  virtual uint64_t dustBalance() override;
+  virtual uint64_t unmixableBalance() override;
 
   virtual size_t getTransactionCount() override;
   virtual size_t getTransferCount() override;
@@ -110,7 +109,6 @@ public:
 
   virtual TransactionId sendTransaction(const WalletLegacyTransfer& transfer, uint64_t fee, const std::string& extra = "", uint64_t mixIn = 0, uint64_t unlockTimestamp = 0) override;
   virtual TransactionId sendTransaction(const std::vector<WalletLegacyTransfer>& transfers, uint64_t fee, const std::string& extra = "", uint64_t mixIn = 0, uint64_t unlockTimestamp = 0) override;
-  virtual TransactionId sendDustTransaction(const std::vector<WalletLegacyTransfer>& transfers, uint64_t fee, const std::string& extra = "", uint64_t mixIn = 0, uint64_t unlockTimestamp = 0) override;
   virtual TransactionId sendFusionTransaction(const std::list<TransactionOutputInformation>& fusionInputs, uint64_t fee, const std::string& extra = "", uint64_t mixIn = 0, uint64_t unlockTimestamp = 0) override;
   virtual std::error_code cancelTransaction(size_t transactionId) override;
 
@@ -152,7 +150,7 @@ private:
   std::vector<TransactionId> deleteOutdatedUnconfirmedTransactions();
 
   uint64_t scanHeightToTimestamp(const uint32_t scanHeight);
-  CryptoNote::BlockDetails getBlock(const uint32_t blockHeight);
+  uint64_t getBlockTimestamp(const uint32_t blockHeight);
 
   enum WalletState
   {
@@ -168,7 +166,7 @@ private:
   std::string m_password;
   const CryptoNote::Currency& m_currency;
   INode& m_node;
-  Logging::ILogger& m_loggerGroup;
+  Logging::LoggerRef m_logger;
   bool m_isStopping;
 
   std::atomic<uint64_t> m_lastNotifiedActualBalance;

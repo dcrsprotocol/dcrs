@@ -1,19 +1,19 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 //
-// This file is part of DCRS.
+// This file is part of Karbo.
 //
-// DCRS is free software: you can redistribute it and/or modify
+// Karbo is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// DCRS is distributed in the hope that it will be useful,
+// Karbo is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with DCRS.  If not, see <http://www.gnu.org/licenses/>.
+// along with Karbo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Account.h"
 #include "CryptoNoteSerialization.h"
@@ -50,47 +50,19 @@ void AccountBase::generateDeterministic() {
   Crypto::generate_deterministic_keys(m_keys.address.viewPublicKey, m_keys.viewSecretKey, second);
   m_creation_timestamp = time(NULL);
 }
+
 //-----------------------------------------------------------------
-Crypto::SecretKey AccountBase::generate_key(const Crypto::SecretKey& recovery_key, bool recover, bool two_random)
-{
-  Crypto::SecretKey first = generate_m_keys(m_keys.address.spendPublicKey, m_keys.spendSecretKey, recovery_key, recover);
-
-  // rng for generating second set of keys is hash of first rng.  means only one set of electrum-style words needed for recovery
-  Crypto::SecretKey second;
-  keccak((uint8_t *)&first, sizeof(Crypto::SecretKey), (uint8_t *)&second, sizeof(Crypto::SecretKey));
-
-  generate_m_keys(m_keys.address.viewPublicKey, m_keys.viewSecretKey, second, two_random ? false : true);
-
-  struct tm timestamp;
-  timestamp.tm_year = 2016 - 1900;  // year 2016
-  timestamp.tm_mon = 5 - 1;  // month May
-  timestamp.tm_mday = 30;  // 30 of May
-  timestamp.tm_hour = 0;
-  timestamp.tm_min = 0;
-  timestamp.tm_sec = 0;
-
-  if (recover)
-  {
-    m_creation_timestamp = mktime(&timestamp);
-  }
-    else
-  {
-    m_creation_timestamp = time(NULL);
-  }
-  return first;
-}
-
-void AccountBase::generateViewFromSpend(Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret, Crypto::PublicKey &viewPublic) {
+void AccountBase::generateViewFromSpend(const Crypto::SecretKey &spendSecret, Crypto::SecretKey &viewSecret, Crypto::PublicKey &viewPublic) {
   Crypto::SecretKey viewKeySeed;
-  keccak((uint8_t *)&spend, sizeof(spend), (uint8_t *)&viewKeySeed, sizeof(viewKeySeed));
+  keccak((uint8_t *)&spendSecret, sizeof(spendSecret), (uint8_t *)&viewKeySeed, sizeof(viewKeySeed));
 
   Crypto::generate_deterministic_keys(viewPublic, viewSecret, viewKeySeed);
 }
 
-void AccountBase::generateViewFromSpend(Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret) {
+void AccountBase::generateViewFromSpend(const Crypto::SecretKey &spendSecret, Crypto::SecretKey &viewSecret) {
   /* If we don't need the pub key */
   Crypto::PublicKey unused_dummy_variable;
-  generateViewFromSpend(spend, viewSecret, unused_dummy_variable);
+  generateViewFromSpend(spendSecret, viewSecret, unused_dummy_variable);
 }
 
 //-----------------------------------------------------------------

@@ -1,21 +1,21 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2017, The Monero Project
-// Copyright (c) 2016-2019, The DarkCrystal developers
+// Copyright (c) 2016-2019, The Karbo developers
 //
-// This file is part of DCRS.
+// This file is part of Karbo.
 //
-// DCRS is free software: you can redistribute it and/or modify
+// Karbo is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// DCRS is distributed in the hope that it will be useful,
+// Karbo is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with DCRS.  If not, see <http://www.gnu.org/licenses/>.
+// along with Karbo.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef __FreeBSD__
   #include <alloca.h>
@@ -26,23 +26,14 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
-#include <mutex>
 
 #include "Common/Varint.h"
 #include "crypto.h"
+#include "crypto-ops.h"
 #include "hash.h"
+#include "random.h"
 
 namespace Crypto {
-
-  using std::abort;
-  using std::int32_t;
-  using std::lock_guard;
-  using std::mutex;
-
-  extern "C" {
-#include "crypto-ops.h"
-#include "random.h"
-  }
 
   static inline unsigned char *operator &(EllipticCurvePoint &point) {
     return &reinterpret_cast<unsigned char &>(point);
@@ -60,22 +51,19 @@ namespace Crypto {
     return &reinterpret_cast<const unsigned char &>(scalar);
   }
 
-  mutex random_lock;
-
   static inline void random_scalar(EllipticCurveScalar &res) {
     unsigned char tmp[64];
-    generate_random_bytes(64, tmp);
+    Random::randomBytes(64, tmp);
     sc_reduce(tmp);
     memcpy(&res, tmp, 32);
   }
 
-  static inline void hash_to_scalar(const void *data, size_t length, EllipticCurveScalar &res) {
+  void hash_to_scalar(const void *data, size_t length, EllipticCurveScalar &res) {
     cn_fast_hash(data, length, reinterpret_cast<Hash &>(res));
     sc_reduce32(reinterpret_cast<unsigned char*>(&res));
   }
 
   void crypto_ops::generate_keys(PublicKey &pub, SecretKey &sec) {
-    lock_guard<mutex> lock(random_lock);
     ge_p3 point;
     random_scalar(reinterpret_cast<EllipticCurveScalar&>(sec));
     ge_scalarmult_base(&point, reinterpret_cast<unsigned char*>(&sec));
@@ -83,7 +71,6 @@ namespace Crypto {
   }
 
   void crypto_ops::generate_deterministic_keys(PublicKey &pub, SecretKey &sec, SecretKey& second) {
-    lock_guard<mutex> lock(random_lock);
     ge_p3 point;
 	sec = second;
     sc_reduce32(reinterpret_cast<unsigned char*>(&sec)); // reduce in case second round of keys (sendkeys)
@@ -92,7 +79,6 @@ namespace Crypto {
   }
  
   SecretKey crypto_ops::generate_m_keys(PublicKey &pub, SecretKey &sec, const SecretKey& recovery_key, bool recover) {
-    lock_guard<mutex> lock(random_lock);
     ge_p3 point;
     SecretKey rng;
     if (recover)
@@ -124,6 +110,20 @@ namespace Crypto {
     }
     ge_scalarmult_base(&point, reinterpret_cast<const unsigned char*>(&sec));
     ge_p3_tobytes(reinterpret_cast<unsigned char*>(&pub), &point);
+    return true;
+  }
+
+  bool crypto_ops::secret_key_mult_public_key(const SecretKey &sec, const PublicKey &pub, PublicKey &result) {
+    if (sc_check(&sec) != 0) {
+      return false;
+    }
+    ge_p3 point;
+    if (ge_frombytes_vartime(&point, &pub) != 0) {
+      return false;
+    }
+    ge_p2 point2;
+    ge_scalarmult(&point2, &sec, &point);
+    ge_tobytes(reinterpret_cast<unsigned char*>(&result), &point2);
     return true;
   }
 
@@ -303,7 +303,6 @@ namespace Crypto {
   };
 
   void crypto_ops::generate_signature(const Hash &prefix_hash, const PublicKey &pub, const SecretKey &sec, Signature &sig) {
-    lock_guard<mutex> lock(random_lock);
     ge_p3 tmp3;
     EllipticCurveScalar k;
     s_comm buf;
@@ -538,7 +537,6 @@ namespace Crypto {
     const PublicKey *const *pubs, size_t pubs_count,
     const SecretKey &sec, size_t sec_index,
     Signature *sig) {
-    lock_guard<mutex> lock(random_lock);
     size_t i;
     ge_p3 image_unp;
     ge_dsmp image_pre;
@@ -635,4 +633,5 @@ namespace Crypto {
     sc_sub(reinterpret_cast<unsigned char*>(&h), reinterpret_cast<unsigned char*>(&h), reinterpret_cast<unsigned char*>(&sum));
     return sc_isnonzero(reinterpret_cast<unsigned char*>(&h)) == 0;
   }
+
 }

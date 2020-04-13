@@ -55,7 +55,6 @@
 #include <System/Dispatcher.h>
 #include <System/Ipv4Address.h>
 
-std::string remote_fee_address;
 namespace{
 	Tools::PasswordContainer pwd_container;
 }
@@ -76,7 +75,6 @@ namespace CryptoNote
 
     bool process_command(const std::vector<std::string> &args);
     std::string get_commands_str();
-    std::string getFeeAddress();
 
     const CryptoNote::Currency& currency() const { return m_currency; }
 
@@ -95,11 +93,9 @@ namespace CryptoNote
     void handle_command_line(const boost::program_options::variables_map& vm);
 
     bool new_wallet(const std::string &wallet_file, const std::string& password);
-    bool new_wallet(const std::string &wallet_file, const std::string& password, const Crypto::SecretKey& secret_key, const Crypto::SecretKey& view_key);
-    bool new_wallet(const std::string &wallet_file, const std::string& password, const Crypto::SecretKey& recovery_key);
-    bool new_wallet(const std::string &wallet_file, const std::string& password, const AccountKeys& private_key);
+    bool new_wallet(const std::string &wallet_file, const std::string& password, const Crypto::SecretKey& spend_secret_key, const Crypto::SecretKey& view_secret_key);
+    bool new_wallet(const std::string &wallet_file, const std::string& password, const AccountKeys& private_keys);
     bool new_tracking_wallet(AccountKeys &tracking_key, const std::string &wallet_file, const std::string& password);
-    //bool open_wallet(const std::string &wallet_file, const std::string& password);
     bool close_wallet();
 
     bool help(const std::vector<std::string> &args = std::vector<std::string>());
@@ -123,7 +119,6 @@ namespace CryptoNote
     bool set_log(const std::vector<std::string> &args);
     bool payment_id(const std::vector<std::string> &args);
     bool change_password(const std::vector<std::string> &args);
-    bool sweep_dust(const std::vector<std::string> &args);
     bool estimate_fusion(const std::vector<std::string> &args);
     bool optimize(const std::vector<std::string> &args);
     bool get_tx_key(const std::vector<std::string> &args);
