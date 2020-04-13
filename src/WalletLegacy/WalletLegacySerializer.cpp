@@ -1,20 +1,20 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
-// Copyright (c) 2018, DCRS developers
+// Copyright (c) 2016-2019, Karbo developers
 //
-// This file is part of DCRS.
+// This file is part of Karbo.
 //
-// DCRS is free software: you can redistribute it and/or modify
+// Karbo is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// DCRS is distributed in the hope that it will be useful,
+// Karbo is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with DCRS.  If not, see <http://www.gnu.org/licenses/>.
+// along with Karbo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "WalletLegacySerializer.h"
 
@@ -151,6 +151,75 @@ void WalletLegacySerializer::deserialize(std::istream& stream, const std::string
   }
 
   serializer.binary(cache, "cache");
+}
+
+// used for password check
+bool WalletLegacySerializer::deserialize(std::istream& stream, const std::string& password) {
+  try {
+    StdInputStream stdStream(stream);
+    CryptoNote::BinaryInputStreamSerializer serializerEncrypted(stdStream);
+
+    serializerEncrypted.beginObject("wallet");
+
+    uint32_t version;
+    serializerEncrypted(version, "version");
+    // set serialization version global variable
+    CryptoNote::WALLET_LEGACY_SERIALIZATION_VERSION = version;
+
+    Crypto::chacha8_iv iv;
+    serializerEncrypted(iv, "iv");
+
+    std::string cipher;
+    serializerEncrypted(cipher, "data");
+
+    serializerEncrypted.endObject();
+
+    std::string plain;
+    decrypt(cipher, plain, iv, password);
+
+    MemoryInputStream decryptedStream(plain.data(), plain.size());
+    CryptoNote::BinaryInputStreamSerializer serializer(decryptedStream);
+
+    CryptoNote::KeysStorage keys;
+    try {
+      keys.serialize(serializer, "keys");
+    }
+    catch (const std::runtime_error&) {
+      return false;
+    }
+    CryptoNote::AccountKeys acc;
+    acc.address.spendPublicKey = keys.spendPublicKey;
+    acc.spendSecretKey = keys.spendSecretKey;
+    acc.address.viewPublicKey = keys.viewPublicKey;
+    acc.viewSecretKey = keys.viewSecretKey;
+
+    Crypto::PublicKey pub;
+    bool r = Crypto::secret_key_to_public_key(acc.viewSecretKey, pub);
+    if (!r || acc.address.viewPublicKey != pub) {
+      return false;
+    }
+
+    if (acc.spendSecretKey != NULL_SECRET_KEY) {
+      Crypto::PublicKey pub;
+      bool r = Crypto::secret_key_to_public_key(acc.spendSecretKey, pub);
+      if (!r || acc.address.spendPublicKey != pub) {
+        return false;
+      }
+    }
+    else {
+      if (!Crypto::check_key(acc.address.spendPublicKey)) {
+        return false;
+      }
+    }
+  }
+  catch (std::system_error&) {
+    return false;
+  }
+  catch (std::exception&) {
+    return false;
+  }
+
+  return true;
 }
 
 void WalletLegacySerializer::decrypt(const std::string& cipher, std::string& plain, Crypto::chacha8_iv iv, const std::string& password) {

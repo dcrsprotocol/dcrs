@@ -1,22 +1,22 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2018, The Monero project
 // Copyright (c) 2014-2018, The Forknote developers
-// Copyright (c) 2016-2018, The DarkCrystal developers
+// Copyright (c) 2016-2018, The Karbowanec developers
 //
-// This file is part of DCRS.
+// This file is part of Karbo.
 //
-// DCRS is free software: you can redistribute it and/or modify
+// Karbo is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// DCRS is distributed in the hope that it will be useful,
+// Karbo is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with DCRS.  If not, see <http://www.gnu.org/licenses/>.
+// along with Karbo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -28,7 +28,7 @@
 #include "Rpc/RpcServer.h"
 
 namespace CryptoNote {
-class core;
+class Core;
 class NodeServer;
 class ICryptoNoteProtocolQuery;
 }
@@ -36,7 +36,7 @@ class ICryptoNoteProtocolQuery;
 class DaemonCommandsHandler
 {
 public:
-  DaemonCommandsHandler(CryptoNote::core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log, const CryptoNote::ICryptoNoteProtocolQuery& protocol, CryptoNote::RpcServer* prpc_server);
+  DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log, const CryptoNote::ICryptoNoteProtocolQuery& protocol, CryptoNote::RpcServer* prpc_server);
 
   bool start_handling() {
     m_consoleHandler.start();
@@ -50,7 +50,7 @@ public:
 private:
 
   Common::ConsoleHandler m_consoleHandler;
-  CryptoNote::core& m_core;
+  CryptoNote::Core& m_core;
   CryptoNote::NodeServer& m_srv;
   Logging::LoggerRef logger;
   Logging::LoggerManager& m_logManager;
@@ -86,4 +86,5 @@ private:
   bool ban(const std::vector<std::string>& args);
   bool unban(const std::vector<std::string>& args);
   bool status(const std::vector<std::string>& args);
+  bool save(const std::vector<std::string>& args);
 };

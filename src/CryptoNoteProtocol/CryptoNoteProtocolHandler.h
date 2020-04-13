@@ -1,19 +1,19 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 //
-// This file is part of DCRS.
+// This file is part of Karbo.
 //
-// DCRS is free software: you can redistribute it and/or modify
+// Karbo is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// DCRS is distributed in the hope that it will be useful,
+// Karbo is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with DCRS.  If not, see <http://www.gnu.org/licenses/>.
+// along with Karbo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -49,6 +49,18 @@ namespace CryptoNote
     public ICryptoNoteProtocolQuery
   {
   public:
+
+
+    struct parsed_block_entry
+    {
+      Block block;
+      std::vector<BinaryArray> txs;
+
+      void serialize(ISerializer& s) {
+        KV_MEMBER(block);
+        KV_MEMBER(txs);
+      }
+    };
 
     CryptoNoteProtocolHandler(const Currency& currency, System::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, Logging::ILogger& log);
 
@@ -94,7 +106,7 @@ namespace CryptoNote
     bool on_connection_synchronized();
     void updateObservedHeight(uint32_t peerHeight, const CryptoNoteConnectionContext& context);
     void recalculateMaxObservedHeight(const CryptoNoteConnectionContext& context);
-    int processObjects(CryptoNoteConnectionContext& context, const std::vector<block_complete_entry>& blocks);
+    int processObjects(CryptoNoteConnectionContext& context, const std::vector<parsed_block_entry>& blocks);
     Logging::LoggerRef logger;
 
   private:
@@ -107,6 +119,7 @@ namespace CryptoNote
     IP2pEndpoint* m_p2p;
     std::atomic<bool> m_synchronized;
     std::atomic<bool> m_stop;
+    std::recursive_mutex m_sync_lock;
 
     mutable std::mutex m_observedHeightMutex;
     uint32_t m_observedHeight;

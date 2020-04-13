@@ -1,21 +1,22 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2018, The TurtleCoin Developers
-// Copyright (c) 2018-2019 The DCRS developers
+// Copyright (c) 2018-2019 The Cash2 developers
+// Copyright (c) 2018-2019 The Karbo developers
 //
-// This file is part of DCRS.
+// This file is part of Karbo.
 //
-// DCRS is free software: you can redistribute it and/or modify
+// Karbo is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// DCRS is distributed in the hope that it will be useful,
+// Karbo is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with DCRS.  If not, see <http://www.gnu.org/licenses/>.
+// along with Karbo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "PaymentServiceJsonRpcMessages.h"
 #include "Serialization/SerializationOverloads.h"
@@ -30,6 +31,7 @@ void Save::Response::serialize(CryptoNote::ISerializer& /*serializer*/) {
 
 void Reset::Request::serialize(CryptoNote::ISerializer& serializer) {
   serializer(viewSecretKey, "viewSecretKey");
+  serializer(scanHeight, "scanHeight");
 }
 
 void Reset::Response::serialize(CryptoNote::ISerializer& serializer) {
@@ -92,13 +94,27 @@ void GetAddresses::Response::serialize(CryptoNote::ISerializer& serializer) {
   serializer(addresses, "addresses");
 }
 
+void GetAddressesCount::Request::serialize(CryptoNote::ISerializer& serializer) {
+}
+
+void GetAddressesCount::Response::serialize(CryptoNote::ISerializer& serializer) {
+  serializer(addresses_count, "addressesCount");
+}
+
 void CreateAddress::Request::serialize(CryptoNote::ISerializer& serializer) {
   bool hasSecretKey = serializer(spendSecretKey, "spendSecretKey");
   bool hasPublicKey = serializer(spendPublicKey, "spendPublicKey");
-  if (!serializer(reset, "reset"))
+  bool hasScanHeight = serializer(scanHeight, "scanHeight");
+  bool hasReset = serializer(reset, "reset");
+  if (!hasReset && !hasScanHeight)
      reset = true;
 
   if (hasSecretKey && hasPublicKey) {
+    //TODO: replace it with error codes
+    throw RequestSerializationError();
+  }
+
+  if (hasScanHeight && hasReset) {
     //TODO: replace it with error codes
     throw RequestSerializationError();
   }
@@ -113,8 +129,18 @@ void CreateAddressList::Request::serialize(CryptoNote::ISerializer& serializer) 
     //TODO: replace it with error codes
     throw RequestSerializationError();
   }
-  if (!serializer(reset, "reset"))
+  bool hasReset = serializer(reset, "reset");
+  if (!hasReset)
     reset = true;
+  bool hasScanHeights = serializer(scanHeights, "scanHeights");
+  if (hasScanHeights && hasReset) {
+    //TODO: replace it with error codes
+    throw RequestSerializationError();
+  }
+  if (hasScanHeights && scanHeights.size() != spendSecretKeys.size()) {
+    //TODO: replace it with error codes
+    throw RequestSerializationError();
+  }
 }
 
 void CreateAddressList::Response::serialize(CryptoNote::ISerializer& serializer) {

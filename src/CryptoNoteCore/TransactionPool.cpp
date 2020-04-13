@@ -1,20 +1,20 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2016, The Forknote developers
 //
-// This file is part of DCRS.
+// This file is part of Karbo.
 //
-// DCRS is free software: you can redistribute it and/or modify
+// Karbo is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// DCRS is distributed in the hope that it will be useful,
+// Karbo is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with DCRS.  If not, see <http://www.gnu.org/licenses/>.
+// along with Karbo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "TransactionPool.h"
 
@@ -390,7 +390,7 @@ namespace CryptoNote {
   }
   //---------------------------------------------------------------------------------
   bool tx_memory_pool::fill_block_template(Block& bl, size_t median_size, size_t maxCumulativeSize,
-    uint64_t already_generated_coins, size_t& total_size, uint64_t& fee) {
+                                           uint64_t already_generated_coins, size_t& total_size, uint64_t& fee) {
     std::lock_guard<std::recursive_mutex> lock(m_transactions_lock);
 
     total_size = 0;
@@ -409,8 +409,8 @@ namespace CryptoNote {
         continue;
       }
 
-      tx_verification_context tvc;
-      if (m_core.check_tx_fee(txd.tx, txd.blobSize, tvc, m_core.get_current_blockchain_height())) {
+      tx_verification_context tvc = boost::value_initialized<tx_verification_context>();
+      if (!m_core.check_tx_fee(txd.tx, txd.blobSize, tvc, m_core.get_current_blockchain_height())) {
         logger(DEBUGGING) << "Transaction " << txd.id << " not included to block template because fee is too small";
         continue;
       }
@@ -436,29 +436,8 @@ namespace CryptoNote {
         total_size += txd.blobSize;
         fee += txd.fee;
         logger(DEBUGGING) << "Transaction " << txd.id << " included to block template";
-      }
-      else {
+      } else {
         logger(DEBUGGING) << "Transaction " << txd.id << " is failed to include to block template";
-      }
-    }
-
-    for (auto it = m_fee_index.rbegin(); it != m_fee_index.rend() && it->fee == 0; ++it) {
-      const auto& txd = *it;
-
-      if (m_currency.fusionTxMaxSize() < total_size + txd.blobSize) {
-        continue;
-      }
-
-      tx_verification_context tvc = boost::value_initialized<tx_verification_context>();
-      if (m_core.check_tx_fee(txd.tx, txd.blobSize, tvc, m_core.get_current_blockchain_height())) {
-        logger(DEBUGGING) << "Transaction " << txd.id << " not included to block template because fee is too small and it's not a fusion";
-        continue;
-      }
-
-      TransactionCheckInfo checkInfo(txd);
-      if (is_transaction_ready_to_go(txd.tx, checkInfo) && blockTemplate.addTransaction(txd.id, txd.tx)) {
-        total_size += txd.blobSize;
-        logger(DEBUGGING) << "Fusion transaction " << txd.id << " included to block template";
       }
     }
 

@@ -47,7 +47,7 @@ private:
   bool fillTxExtra(const std::vector<uint8_t>& rawExtra, TransactionExtraDetails2& extraDetails);
   size_t median(std::vector<size_t>& v);
 
-  CryptoNote::ICore& core;
+  CryptoNote::ICore& m_core;
   CryptoNote::ICryptoNoteProtocolQuery& protocol;
 };
 }

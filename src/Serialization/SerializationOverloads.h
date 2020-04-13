@@ -1,19 +1,21 @@
-// Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2018-2019, The TurtleCoin Developers
+// Copyright (c) 2016-2019, The Karbo developers
 //
-// This file is part of DCRS.
+// This file is part of Karbo.
 //
-// DCRS is free software: you can redistribute it and/or modify
+// Karbo is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// DCRS is distributed in the hope that it will be useful,
+// Karbo is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with DCRS.  If not, see <http://www.gnu.org/licenses/>.
+// along with Karbo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -39,9 +41,16 @@ serializeAsBinary(std::vector<T>& value, Common::StringView name, CryptoNote::IS
   std::string blob;
   if (serializer.type() == ISerializer::INPUT) {
     serializer.binary(blob, name);
-    value.resize(blob.size() / sizeof(T));
-    if (blob.size()) {
-      memcpy(&value[0], blob.data(), blob.size());
+    const size_t blobSize = blob.size();
+
+    value.resize(blobSize / sizeof(T));
+
+    if (blobSize % sizeof(T) != 0) {
+      throw std::runtime_error("Invalid blob size given!");
+    }
+
+    if (blobSize > 0) {
+      memcpy(&value[0], blob.data(), blobSize);
     }
   } else {
     if (!value.empty()) {
@@ -59,6 +68,11 @@ serializeAsBinary(std::list<T>& value, Common::StringView name, CryptoNote::ISer
     serializer.binary(blob, name);
 
     size_t count = blob.size() / sizeof(T);
+
+    if (blob.size() % sizeof(T) != 0) {
+      throw std::runtime_error("Invalid blob size given!");
+    }
+
     const T* ptr = reinterpret_cast<const T*>(blob.data());
 
     while (count--) {
